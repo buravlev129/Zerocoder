@@ -1,0 +1,11 @@
+{
+   "TaskTracker": {
+      "theme": "vista",
+      "frmMain": {
+         "width": 612,
+         "height": 525,
+         "top": 341,
+         "left": 571
+      }
+   }
+}
