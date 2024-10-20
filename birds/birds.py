@@ -214,10 +214,12 @@ class Game:
 
 if __name__ == "__main__":
     
-    game = Game(900, 750, "Funny birds")
+    game = Game(850, 700, "Funny birds")
     try:
         game.add_object(Bird(game.imagepath, 70, 45))
-        game.add_object(Bird(game.imagepath, 50, 35))
+        game.add_object(Bird(game.imagepath, 55, 35))
+        game.add_object(Bird(game.imagepath, 30, 35))
+
         game.add_object(Bird(game.imagepath, 30, 35))
 
         game.main_loop()
