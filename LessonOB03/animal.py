@@ -17,6 +17,17 @@ class Animal(ABC):
     def eat(self):
         print(f"{self.name} is eating.")
 
+    @abstractmethod
+    def to_dict(self):
+        pass
+
+    @classmethod
+    @abstractmethod
+    def from_dict(cls, data):
+        pass
+
+
+
 
 class Bird(Animal):
     """
@@ -40,6 +51,14 @@ class Crow(Bird):
     def make_sound(self):
         print(f"{self.__class__.__name__} каркает.")
 
+    def to_dict(self):
+        return { f"{self.__class__.__name__}": {"name": self.name, "age": self.age, "wing_span": self.wing_span}}
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(data.get("name"), data.get("age"), data.get("wing_span"))
+
+
 class Sparrow(Bird):
     """
     Подкласс Воробей
@@ -50,6 +69,12 @@ class Sparrow(Bird):
     def make_sound(self):
         print(f"{self.__class__.__name__} чирикает.")
 
+    def to_dict(self):
+        return { f"{self.__class__.__name__}": {"name": self.name, "age": self.age, "wing_span": self.wing_span}}
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(data.get("name"), data.get("age"), data.get("wing_span"))
 
 
 class Mammal(Animal):
@@ -74,6 +99,13 @@ class Cat(Mammal):
     def make_sound(self):
         print(f"{self.__class__.__name__} мяукает.")
 
+    def to_dict(self):
+        return {f"{self.__class__.__name__}": {"name": self.name, "age": self.age, "fur_color": self.fur_color}}
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(data.get("name"), data.get("age"), data.get("fur_color"))
+
 class Dog(Mammal):
     """
     Собака
@@ -83,6 +115,13 @@ class Dog(Mammal):
         
     def make_sound(self):
         print(f"{self.__class__.__name__} тяфкает.")
+
+    def to_dict(self):
+        return {f"{self.__class__.__name__}": {"name": self.name, "age": self.age, "fur_color": self.fur_color}}
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(data.get("name"), data.get("age"), data.get("fur_color"))
 
 
 
@@ -109,7 +148,15 @@ class Snake(Reptile):
         print(f"{self.__class__.__name__} шипит.")
 
     def __str__(self):
-        return f"{self.__class__.__name__} {self.name}, {self.age} лет, не имеет ног"
+        return f"{self.__class__.__name__} {self.name}, {self.age} лет"
+
+    def to_dict(self):
+        return {f"{self.__class__.__name__}": {"name": self.name, "age": self.age}}
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(data.get("name"), data.get("age"))
+
 
 class Lizard(Reptile):
     """
@@ -123,6 +170,13 @@ class Lizard(Reptile):
 
     def __str__(self):
         return f"{self.__class__.__name__} {self.name}, {self.age} лет, имеет 4 ноги"
+
+    def to_dict(self):
+        return {f"{self.__class__.__name__}": {"name": self.name, "age": self.age}}
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(data.get("name"), data.get("age"))
 
 
 
