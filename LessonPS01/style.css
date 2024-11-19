@@ -1,0 +1,58 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+}
+
+nav a {
+    color: #fff;
+    margin: 0 15px;
+    text-decoration: none;
+}
+
+.container {
+    padding: 20px;
+}
+
+table {
+    width: 50%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background-color: #93f3f9;
+}
+
+td:nth-child(even) {
+    background-color: #eee;
+}
+
+.note {
+    font-size: 0.8em;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color: gray;
+    font-style: italic;
+}
+.sent {
+    font-size: 0.8em;
+    color: darkgreen;
+    font-style: italic;
+}
