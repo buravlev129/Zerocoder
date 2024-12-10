@@ -1,0 +1,64 @@
+
+body {
+    display: flex;
+    font-family: Arial, sans-serif;
+    background-color:darkseagreen ;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    height: 100vh;
+}
+
+.photo {
+    width: 200px;
+    height: 200px;
+    border-radius: 10px;
+    margin: 0 auto;
+}
+
+
+.card-container {
+    display: flex;
+    gap: 20px; /* Расстояние между карточками */
+}
+
+.card{
+    font-family: DejaVu Sans Mono, monospace;
+    width: 250px;
+    height: 350px;
+    background-color: lavenderblush;
+    border: 2px solid darkolivegreen;
+    border-radius: 10px;
+    box-shadow: 0 5px 6px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    padding: 10px;
+}
+
+div.card:hover {
+    background-color:lemonchiffon;
+    border-color:chartreuse;
+    border-width: 2;
+}
+
+p.compact {
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.last-name {
+    font-size: larger;
+    color: darkslategray;
+    font-weight: bold;
+    margin: 10px 0 5px;
+}
+
+.full-name {
+    color: cadetblue;
+    margin: 0 0 10px;
+}
+
+.info {
+    color: darkslategray;
+    font-size: smaller;
+}
+
