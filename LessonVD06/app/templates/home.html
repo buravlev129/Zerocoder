@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h3 class="mb-4">Заполни форму:</h3>
+    <form method="POST" action="/">
+        <div class="form-group">
+            <label for="name">Имя:</label>
+            <input type="text" id="name" name="name" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="city">Город:</label>
+            <input type="text" id="city" name="city" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="hobby">Хобби:</label>
+            <textarea id="hobby" name="hobby" rows="3" class="form-control" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="age">Возраст:</label>
+            <input type="number" id="age" name="age" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Отправить</button>
+    </form>
+
+    <hr>
+    {% if anketa %}
+        <h4 class="mt-5">Введенные данные:</h4>
+        <div class="card mt-3">
+            <div class="card-body">
+                <p><strong>Имя:</strong> {{ anketa.name }}</p>
+                <p><strong>Город:</strong> {{ anketa.city }}</p>
+                <p><strong>Хобби:</strong> {{ anketa.hobby }}</p>
+                <p><strong>Возраст:</strong> {{ anketa.age }}</p>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
