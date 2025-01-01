@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block hello %}
+    <div class="hello">
+        {{ hello }}
+    </div>
+{% endblock %}
+
+{% block content %}
+    <h3 class="mb-4">Личный кабинет</h3>
+    <a class="btn btn-primary" href="{{ url_for('editdata') }}"><span>Редактировать данные</span></a>
+{% endblock %}
+

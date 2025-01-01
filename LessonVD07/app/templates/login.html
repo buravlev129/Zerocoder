@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block hello %}
+    <div class="hello">
+        {{ hello }}
+    </div>
+{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="margin-top: 50px;">
+    <div class="login-form border rounded shadow p-4" style="width: 420px; height: 300px;">
+        <h3 class="text-center">Вход</h3>
+        <form method="post" action="{{ url_for('login') }}">
+            {{ form.hidden_tag() }}
+            
+            <div class="row mb-3">
+                <div class="col-2">
+                    {{ form.email.label(class="form-label") }}
+                </div>
+                <div class="col-10">
+                    {{ form.email(size=32, class="form-control") }}
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-2">
+                    {{ form.password.label(class="form-label") }}
+                </div>
+                <div class="col-10">
+                    {{ form.password(size=32, class="form-control") }}
+                </div>
+            </div>
+            
+            <div class="mb-3 form-check">
+                <div class="col-10">
+                    {{ form.remember(class="form-check-input") }} 
+                    {{ form.remember.label(class="form-check-label") }}
+                </div>
+            </div>
+
+            <div class="d-grid">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                <div class="container">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% endwith %}
+        </form>
+    </div>
+</div>
+{% endblock %}

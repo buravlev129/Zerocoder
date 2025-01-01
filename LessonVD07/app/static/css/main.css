@@ -1,0 +1,38 @@
+html, body {
+    height: 100%;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    background-color: #f8f9fa;
+}
+
+.header {
+    background-color: #007bff;
+    color: white;
+    padding: 15px 0;
+}
+.content {
+    flex: 1;
+}
+.footer {
+    background-color: #007bff;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+}
+
+.social-icons a {
+    color: white;
+    margin: 0 10px;
+    text-decoration: none;
+}
+
+.slider img {
+    width: 100%;
+    height: auto;
+}
+
+@media (max-width: 576px) {
+    .card-deck .card {
+        margin-bottom: 15px;
+    }
+}

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block hello %}
+    <div class="hello">
+        {{ hello }}
+    </div>
+{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="margin-top: 50px;">
+    <div class="login-form border rounded shadow p-4" style="width: 420px;">
+        <h3 class="text-center">Редактирование данных</h3>
+
+        <form method="post" action="{{ url_for('editdata') }}">
+            {{ form.hidden_tag() }}
+            <div class="row mb-3">
+                <div class="col-2">
+                    <span>{{ form.userid.label(class="form-label") }}:</span>
+                </div>
+                <div class="col-6">
+                    {{ form.userid(size=32, class="form-control", disabled=True) }}
+                </div>
+            </div>
+            <hr>
+            <div class="mb-3">
+                <span>{{ form.username.label(class="form-label") }}:</span>
+                {{ form.username(size=32, class="form-control") }}
+                {% for error in form.username.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <div class="mb-3">
+                <span>{{ form.email.label(class="form-label") }}:</span>
+                {{ form.email(size=32, class="form-control") }}
+                {% for error in form.email.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <div class="mb-3">
+                <span>{{ form.password.label(class="form-label") }}:</span>
+                {{ form.password(size=32, class="form-control") }}
+                {% for error in form.password.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+                </div>
+            <div class="mb-3">
+                <span>{{ form.confirm_password.label(class="form-label") }}:</span>
+                {{ form.confirm_password(size=32, class="form-control") }}
+                {% for error in form.confirm_password.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <div class="d-grid">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                <div class="container">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% endwith %}
+
+        </form>
+
+    </div>
+</div>
+{% endblock %}
+
