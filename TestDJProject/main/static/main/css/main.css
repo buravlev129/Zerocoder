@@ -1,0 +1,38 @@
+
+html, body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background-color:azure;
+}
+
+.main-content {
+    flex: 1;
+}
+
+.menu {
+    background-color:darkseagreen;
+    padding: 10px 0;
+}
+
+.nav-link {
+    color: #333;
+}
+
+.footer {
+    background-color: darkseagreen;
+    color: #333;
+    padding: 10px 0;
+    text-align: center;
+}
+
+.social-icons a {
+    margin: 0 10px;
+    color: #333;
+    text-decoration: none;
+}
+
+.social-icons a:hover {
+    color: #007bff;
+}
