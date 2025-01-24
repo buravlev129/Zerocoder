@@ -1,0 +1,24 @@
+{% extends "main/layout.html" %}
+{% load static %}
+
+{% block title %}Новости{% endblock %}
+
+{% block content %}
+<h1>Новостная страница</h1>
+
+{% for post in news %}
+<div>
+    <strong>{{ post.pub_date }}&nbsp;Автор: {{ post.username }}</strong>
+    <h5> {{ post.title }} </h5>
+    <p style="font-size: smaller;" >{{ post.short_description }}</p>
+    <div>
+        <img src="{% static 'news/' %}{{ post.image }}" width="{{ post.image_width }}px" height="{{ post.image_height }}px" >
+    </div>
+    <p>{{ post.text|safe }}</p>
+    <hr>
+</div>
+
+{% endfor %}
+
+{% endblock %}
+
