@@ -1,0 +1,36 @@
+{% extends "films/layout.html" %}
+{% load static %}
+
+{% block title %}Добавление фильма{% endblock %}
+
+{% block content %}
+<h2>Добавление фильма</h2>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="id_title" class="form-label">Название фильма</label>
+                {{ form.title }}
+            </div>
+            <div class="mb-3">
+                <label for="id_description" class="form-label">Краткое описание</label>
+                {{ form.description }}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="id_review" class="form-label">Отзыв о фильме</label>
+                {{ form.review }}
+            </div>
+            <div class="mb-3">
+                <label for="id_image" class="form-label">Ссылка на картинку</label>
+                {{ form.image }}
+            </div>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+</form>
+
+{% endblock %}
