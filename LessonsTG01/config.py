@@ -1,0 +1,5 @@
+
+TOKEN = "xxxxx-xxxxxx"
+
+OPENWEATHERMAP_API_KEY = '55555566666'
+
