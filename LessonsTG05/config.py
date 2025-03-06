@@ -1,4 +1,4 @@
 
 TOKEN = "xxxx"
 
-NASA_API_KEY = 'C7R1zuggaCUUvIvvriSz8q15FBxGmhSQVVNCCcx7'
+NASA_API_KEY = 'xxxx'
