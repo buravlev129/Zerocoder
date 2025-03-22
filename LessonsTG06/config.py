@@ -1,0 +1,6 @@
+
+TOKEN = "xxx"
+
+OPENWEATHERMAP_API_KEY = 'xxx'
+NASA_API_KEY = 'xxxx'
+EXCHANGE_RATE_KEY = 'xxxx'
