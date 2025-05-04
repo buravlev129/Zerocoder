@@ -1,0 +1,74 @@
+{% load static %}
+
+
+<header class="menu">
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-lg border-bottom ">
+            <a class="navbar-brand" href="{% url 'main' %}">Flower Delivery</a>
+
+            {% if user.is_authenticated %}
+                {% if user.is_staff %}
+                   <div class="greet">Привет, {{ user.username }}!</div>
+                {% else %}
+                   <div class="greet">Добро пожаловать, {{ user.username }}!</div>
+                {% endif %}
+            {% endif %}
+
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <div>
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{% url 'main' %}">Главная</a>
+                        </li>
+
+                        {% if user.is_staff %}
+                            {% comment %}
+                            <li class="nav-item">
+                                <a class="nav-link " href="{% url 'add_product' %}">Карточка</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="{% url 'order_list' %}">Заказы</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="{% url 'report_list' %}">Аналитика</a>
+                            </li>
+                            {% endcomment %}
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'logout' %}">/Выход</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'about' %}">О нас</a>
+                            </li>
+
+                            {% if user.is_authenticated %}
+                                {% comment %}
+                                <li class="nav-item" >
+                                    <a class="nav-link cart-button" href="{% url 'process_order' %}">
+                                        <i class="bi bi-cart"></i><span class="cart-total">{ {{ request.session.cart_total }} }</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'order_history' %}">История</a>
+                                </li>
+                                {% endcomment %}
+                                
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'logout' %}">/Выход</a>
+                                </li>
+                            {% else %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'login' %}">Вход</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'register' %}">Регистрация</a>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>

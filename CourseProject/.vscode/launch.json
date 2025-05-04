@@ -1,0 +1,36 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            // "console": "integratedTerminal",
+            "console": "internalConsole",
+            "justMyCode": true
+        },
+        {
+            "name": "Debug Django Tests",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "django",
+            "args": [
+                "test",
+                //"main.tests.test_views.OrderViewsTest",
+                //"main.tests.test_integration.OrderProcessIntegrationTest",
+                "main.tests",
+                "--noinput",
+                "--keepdb",
+                "-v 2"
+            ],
+            "env": {
+                "DJANGO_SETTINGS_MODULE": "FlowerDelivery.settings",
+                "PYTHONPATH": "${workspaceFolder}/FlowerDelivery;"
+            }
+        }
+    ]
+}
