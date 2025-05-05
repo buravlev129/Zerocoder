@@ -1,0 +1,52 @@
+{% extends "main/layout.html" %}
+{% load static %}
+
+{% block title %}Flower Delivery{% endblock %}
+
+{% block content %}
+    <h3>Каталог цветов</h3>
+    <div class="card-container">
+        {% for product in page_obj %}
+        <div class="card" data-product-id="{{ product.id }}">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% else %}
+                <p>Нет изображения</p>
+            {% endif %}
+            <h3>{{ product.name|truncatechars:35 }}</h3>
+            <p>{{ product.price }} руб.</p>
+
+            <!-- Звездочки для оценки -->
+            <div class="rating-stars">
+                {% for i in "12345" %}
+                <span class="star" data-rating="{{ i }}">☆</span>
+                {% endfor %}
+                {% if product.average_rating > 0 %}
+                  &nbsp; <span class="star">{{ product.average_rating }}</span>
+                {% endif %}
+            </div>
+            {% if user.is_authenticated %}
+            <form method="post" action="">
+                {% csrf_token %}
+                <input type="hidden" name="product_id" value="{{ product.id }}">
+                <button type="submit" class="btn btn-primary btn-sm" 
+                  {% if user.is_staff %} disabled {% endif %}>Купить
+                </button>
+            </form>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Пагинация -->
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}"><< Назад</a>
+        {% endif %}
+        <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Далее >></a>
+        {% endif %}
+    </div>
+{% endblock %}
+

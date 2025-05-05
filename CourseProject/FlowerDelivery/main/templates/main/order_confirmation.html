@@ -1,0 +1,23 @@
+{% extends "main/layout.html" %}
+{% load static %}
+
+{% block title %}Flower Delivery{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h2>Заказ успешно оформлен!</h2>
+        <p><strong>Номер заказа:</strong> {{ order.id }}</p>
+        <p><strong>Адрес доставки:</strong> {{ order.delivery_address }}</p>
+        <p><strong>Телефон:</strong> {{ order.phone_number }}</p>
+        <p><strong>Дата заказа:</strong> {{ order.created_at }}</p>
+
+        <h3>Товары в заказе:</h3>
+        <ul>
+            {% for detail in order.details.all %}
+                <li>{{ detail.product.name }} ({{ detail.quantity }} шт.) - {{ detail.total_price }} руб.</li>
+            {% endfor %}
+        </ul>
+        
+    </div>
+{% endblock %}
+

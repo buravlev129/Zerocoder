@@ -1,0 +1,56 @@
+{% extends "main/layout.html" %}
+{% load static %}
+
+{% block title %}Flower Delivery{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h3>Оформление заказа</h3>
+
+        <h5>Товары в корзине:</h5>
+        <table class="table table-bordered order">
+            <thead>
+                <tr>
+                    <th width="180px">Фотография</th>
+                    <th width="250px">Название</th>
+                    <th width="80px">Количество</th>
+                    <th width="80px">Цена за единицу</th>
+                    <th width="80px">Общая стоимость</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart_items %}
+                <tr>
+                    <td><img class="img_preview" src="{{ item.product.image.url }}" alt="{{ item.product.name }}"></td>
+                    <td>{{ item.product.name }}</td>
+                    <td align="center">{{ item.quantity }}</td>
+                    <td>{{ item.product.price }} руб.</td>
+                    <td>{{ item.total_price }} руб.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <table class="table table-borderless order">
+            <tr>
+                <td align="right"><h5 class="order">Общая стоимость: <strong>{{ total_cart_price|floatformat:2 }} руб.</strong></h5>
+                </td>
+            </tr>
+        </table>
+
+        <p></p>
+        <form method="post" id="process-order-form">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="{{ form.delivery_address.id_for_label }}" class="form-label">Адрес доставки</label>
+                {{ form.delivery_address }}
+            </div>
+            <div class="mb-3">
+                <label for="{{ form.phone_number.id_for_label }}" class="form-label">Телефон</label>
+                {{ form.phone_number }}
+            </div>
+            <button type="submit" name="action" value="confirm" class="btn btn-primary">Оформить заказ</button>
+            <button type="submit" name="action" value="cancel" class="btn btn-danger" formnovalidate>Отменить заказ</button>
+        </form>
+    </div>
+{% endblock %}
+

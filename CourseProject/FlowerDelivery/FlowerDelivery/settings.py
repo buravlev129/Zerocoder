@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'imagekit',
 ]
 
 MIDDLEWARE = [
@@ -125,3 +126,12 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Custom parameters for FlowerDelivery Application
+PRODUCT_IMAGE_WIDTH = 800
+PRODUCT_IMAGE_HEIGHT = 600
+PRODUCT_THUMBNAIL_WIDTH = 250
+PRODUCT_THUMBNAIL_HEIGHT = 240
+
+

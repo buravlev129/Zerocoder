@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 
+from .models import Product, Order
+
 
 class RegisterForm(UserCreationForm):
     """
@@ -38,4 +40,42 @@ class CustomAuthenticationForm(AuthenticationForm):
         # self.add_error(None, "Вторая глобальная ошибка.")
         return cleaned_data
 
+
+class ProductForm(forms.ModelForm):
+    """
+    Добавление нового продукта (букета)
+    """
+    class Meta:
+        model = Product
+        fields = ['name', 'price', 'image', 'thumbnail', 'tags']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'price': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'style': 'width: 100px;',
+                }),
+
+            'image': forms.ClearableFileInput(attrs={'class': 'form-control-file', 'id': 'id_image'}),
+            'tags': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            'name': 'Название',
+            'price': 'Цена',
+            'image': 'Фотография',
+            'thumbnail': 'Миниатюра',
+            'tags': 'Список тегов',
+        }
+
+
+class OrderForm(forms.ModelForm):
+    """
+    Обработка заказа
+    """
+    class Meta:
+        model = Order
+        fields = ['delivery_address', 'phone_number']
+        widgets = {
+            'delivery_address': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите адрес доставки'}),
+            'phone_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите номер телефона'}),
+        }
 

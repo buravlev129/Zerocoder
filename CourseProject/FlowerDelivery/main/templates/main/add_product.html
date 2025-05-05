@@ -1,0 +1,33 @@
+{% extends "main/layout.html" %}
+{% load static %}
+
+{% block title %}Добавление букета{% endblock %}
+
+{% block content %}
+<h3>Добавить новый букет</h3>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="{{ form.name.id_for_label }}">Название</label>
+        {{ form.name }}
+    </div>
+    <div class="form-group">
+        <label for="{{ form.tags.id_for_label }}">Теги</label>
+        {{ form.tags }}
+    </div>
+    <div class="form-group">
+        <label for="{{ form.image.id_for_label }}">Фотография</label>
+        <!-- Контейнер для превью -->
+        <div id="image-preview-container" style="margin-bottom: 10px;">
+            <img id="image-preview" src="#" alt="Превью изображения" style="max-width: 300px; max-height: 300px; display: none;" />
+        </div>
+        {{ form.image }}
+    </div>
+    <div class="form-group">
+        <label for="{{ form.price.id_for_label }}">Цена</label>
+        {{ form.price }}
+    </div>
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+</form>
+{% endblock %}
+
