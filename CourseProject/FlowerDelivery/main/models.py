@@ -26,6 +26,10 @@ class UserProfile(models.Model):
     def __str__(self):
         return self.user.username
 
+    class Meta:
+        verbose_name = "Профиль пользователя"
+        verbose_name_plural = "Профили пользователей"
+
 
 # Таблица товаров (ID, название, цена, изображение).
 class Product(models.Model):
@@ -92,6 +96,10 @@ class OrderStatus(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = "Статус заказа"
+        verbose_name_plural = "Статусы заказа"
+
 
 class Order(models.Model):
     """
@@ -109,6 +117,10 @@ class Order(models.Model):
     def total_price(self):
         return self.details.aggregate(total=Sum(F('price') * F('quantity')))['total'] or 0
 
+    class Meta:
+        verbose_name = "Заказ"
+        verbose_name_plural = "Заказы"
+
 
 class OrderDetail(models.Model):
     """
@@ -125,6 +137,10 @@ class OrderDetail(models.Model):
     def __str__(self):
         return f"{self.product.name} (x{self.quantity})"
 
+    class Meta:
+        verbose_name = "Подробная информация о заказе"
+        verbose_name_plural = "Подробная информация о заказе"
+
 
 #
 # Поддержка отзывов и рейтингов.
@@ -139,6 +155,8 @@ class ProductRating(models.Model):
 
     class Meta:
         unique_together = ('product', 'user')  # Один пользователь может оставить только одну оценку для продукта
+        verbose_name = "Оценка продукта"
+        verbose_name_plural = "Оценка продукта"
 
     def __str__(self):
         return f"{self.product.name} - {self.user.username}: {self.rating}"
@@ -156,3 +174,6 @@ class OrderReview(models.Model):
     def __str__(self):
         return f"Отзыв к заказу #{self.order.id} от {self.user.username}"
 
+    class Meta:
+        verbose_name = "Отзывы покупателя"
+        verbose_name_plural = "Отзывы покупателя"
