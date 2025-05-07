@@ -1,0 +1,81 @@
+{% extends "main/layout.html" %}
+{% load static %}
+
+{% block title %}Flower Delivery{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h2>Заказ № {{ order.id }}</h2>
+
+        <p><strong>Покупатель:</strong> {{ order.user.username }}</p>
+        <p><strong>Дата заказа:</strong> {{ order.created_at }}</p>
+        <p><strong>Адрес доставки:</strong> {{ order.delivery_address }}</p>
+        <p><strong>Телефон:</strong> {{ order.phone_number }}</p>
+
+        <h4>Товары в заказе:</h4>
+        <table class="table table-bordered order">
+            <thead>
+                <tr>
+                    <th width="180px">Фотография</th>
+                    <th>Название</th>
+                    <th>Количество</th>
+                    <th>Цена за единицу</th>
+                    <th>Общая стоимость</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for detail in order.details.all %}
+                <tr>
+                    <td><img class="img_preview" src="{{ detail.product.image.url }}" alt="{{ detail.product.name }}"></td>
+                    <td>{{ detail.product.name }}</td>
+                    <td>{{ detail.quantity }}</td>
+                    <td>{{ detail.price }} руб.</td>
+                    <td>{{ detail.total_price }} руб.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <table class="table table-borderless order">
+            <tr>
+                <td align="right"><h5 class="order">Общая стоимость: <strong>{{ order.total_price|floatformat:2 }} руб.</strong></h5>
+                </td>
+            </tr>
+        </table>
+
+        <!-- Форма для изменения статуса -->
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="status" class="font-weight-bold">Статус заказа</label>
+                <select name="status" id="status" class="form-control custom-select">
+                    {% for status in statuses %}
+                    <option value="{{ status.id }}" {% if status == order.status %}selected{% endif %}>
+                        {{ status.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>            
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+        </form>
+
+        <!-- Отзыв покупателя -->
+        {% if review %}
+            <div class="mt-4">
+                <h5>Отзыв покупателя</h5>
+                <div>
+                    <p>{{ review.text }}</p>
+                    <small>Добавлено: {{ review.created_at }}</small>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Сообщения об успешном сохранении -->
+        <!-- {% if messages %}
+            <div class="mt-3">
+                {% for message in messages %}
+                <div class="alert alert-success">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %} -->
+    </div>
+{% endblock %}

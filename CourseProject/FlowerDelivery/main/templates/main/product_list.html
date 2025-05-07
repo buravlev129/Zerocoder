@@ -18,21 +18,40 @@
 
             <!-- Звездочки для оценки -->
             <div class="rating-stars">
-                {% for i in "12345" %}
-                <span class="star" data-rating="{{ i }}">☆</span>
-                {% endfor %}
-                {% if product.average_rating > 0 %}
-                  &nbsp; <span class="star">{{ product.average_rating }}</span>
+                {% if user.is_authenticated and not user.is_staff %}
+                    {% for i in "12345" %}
+                       <span class="star" data-rating="{{ i }}">☆</span>
+                    {% endfor %}
+                    {% if product.average_rating > 0 %}
+                       &nbsp; <span class="star">{{ product.average_rating }}</span>
+                    {% endif %}
+                {% else %}
+                    {% for i in "12345" %}
+                       <span class="s_tar" data-rating="{{ i }}">☆</span>
+                    {% endfor %}
+                    {% if product.average_rating > 0 %}
+                       &nbsp; <span class="s_tar">{{ product.average_rating }}</span>
+                    {% endif %}
                 {% endif %}
             </div>
+
             {% if user.is_authenticated %}
-            <form method="post" action="">
-                {% csrf_token %}
-                <input type="hidden" name="product_id" value="{{ product.id }}">
-                <button type="submit" class="btn btn-primary btn-sm" 
-                  {% if user.is_staff %} disabled {% endif %}>Купить
-                </button>
-            </form>
+                <form method="post" action="">
+                    {% csrf_token %}
+                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                    <button type="submit" class="btn btn-primary btn-sm" 
+                    {% if user.is_staff %} disabled {% endif %}>Купить
+                    {% if user.is_staff %}<i class="bi bi-lock"></i>{% endif %}
+                    </button>
+                </form>
+            {% else %}
+                <form method="post" action="">
+                    {% csrf_token %}
+                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                    <button type="submit" class="btn btn-primary btn-sm" disabled>Купить
+                        <i class="bi bi-lock"></i>
+                    </button>
+                </form>
             {% endif %}
         </div>
         {% endfor %}

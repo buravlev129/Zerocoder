@@ -1,0 +1,53 @@
+{% extends "main/layout.html" %}
+{% load static %}
+
+{% block title %}Flower Delivery{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h3>Обработка заказов</h3>
+
+    <!-- Комбобокс для фильтрации -->
+    <form method="get" class="mb-4">
+        <div class="form-group">
+            <select name="filter" id="filter" class="form-control" onchange="this.form.submit()">
+                <option value="working" {% if current_filter == 'working' %}selected{% endif %}>Рабочие заказы</option>
+                <option value="completed" {% if current_filter == 'completed' %}selected{% endif %}>Выполненные заказы</option>
+            </select>
+        </div>
+    </form>
+
+    {% if orders %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID заказа</th>
+                    <th>Дата заказа</th>
+                    <th>Статус</th>
+                    <th>Покупатель</th>
+                    <th>Адрес доставки</th>
+                    <th>Телефон</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.created_at }}</td>
+                    <td>{{ order.status.name }}</td>
+                    <td>{{ order.user.username }}</td>
+                    <td>{{ order.delivery_address }}</td>
+                    <td>{{ order.phone_number }}</td>
+                    <td>
+                        <a href="{% url 'order_in_work' order.id %}" class="btn btn-sm btn-primary">Подробности</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Нет заказов для обработки.</p>
+    {% endif %}
+</div>
+{% endblock %}

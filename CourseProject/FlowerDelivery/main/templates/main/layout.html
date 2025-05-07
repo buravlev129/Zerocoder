@@ -10,7 +10,48 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link href="{% static 'main/css/main.css' %}" rel="stylesheet">
-    <script src="{% static 'main/js/layout.js' %}"></script>    
+    <script src="{% static 'main/js/layout.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Обработка кликов по звездочкам
+            document.querySelectorAll('.rating-stars .star').forEach(star => {
+                star.addEventListener('click', async function () {
+                    const card = this.closest('.card');
+                    const productId = card.dataset.productId;
+                    const rating = this.dataset.rating;
+    
+                    // Отправляем оценку на сервер через AJAX
+                    try {
+                        const response = await fetch('/api/rate-product/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': '{{ csrf_token }}',
+                            },
+                            body: JSON.stringify({ product_id: productId, rating: rating }),
+                        });
+    
+                        if (response.ok) {
+                            // Обновляем внешний вид звездочек
+                            const stars = card.querySelectorAll('.rating-stars .star');
+                            stars.forEach((star, index) => {
+                                star.classList.toggle('filled', index < rating);
+                            });
+
+                            setTimeout(() => {
+                                location.reload();
+                            }, 500);
+
+                        } else {
+                            alert('Ошибка при сохранении оценки');
+                        }
+                    } catch (error) {
+                        console.error('Ошибка:', error);
+                    }
+                });
+            });
+        });
+    </script>
 </head>
 <body>
 {% include 'main/menu.html' %}

@@ -1,0 +1,40 @@
+{% extends "main/layout.html" %}
+{% load static %}
+
+{% block title %}Flower Delivery{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h3>История заказов</h3>
+
+    {% if orders %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID заказа</th>
+                    <th>Дата заказа</th>
+                    <th>Статус</th>
+                    <th>Адрес доставки</th>
+                    <th>Телефон</th>
+                    <th>Детали</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.created_at }}</td>
+                    <td>{{ order.status.name }}</td>
+                    <td>{{ order.delivery_address }}</td>
+                    <td>{{ order.phone_number }}</td>
+                    <td>
+                        <a href="{% url 'order_details' order.id %}" class="btn btn-sm btn-primary">Посмотреть детали</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>У вас пока нет заказов.</p>
+    {% endif %}
+</div>{% endblock %}

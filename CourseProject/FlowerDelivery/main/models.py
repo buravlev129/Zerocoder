@@ -125,3 +125,34 @@ class OrderDetail(models.Model):
     def __str__(self):
         return f"{self.product.name} (x{self.quantity})"
 
+
+#
+# Поддержка отзывов и рейтингов.
+#
+class ProductRating(models.Model):
+    """
+    Оценка продукта
+    """
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='ratings')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    rating = models.PositiveIntegerField(choices=[(i, i) for i in range(1, 6)])  # Оценка от 1 до 5
+
+    class Meta:
+        unique_together = ('product', 'user')  # Один пользователь может оставить только одну оценку для продукта
+
+    def __str__(self):
+        return f"{self.product.name} - {self.user.username}: {self.rating}"
+
+
+class OrderReview(models.Model):
+    """
+    Отзыв покупателя
+    """
+    order = models.OneToOneField('Order', on_delete=models.CASCADE, related_name='review')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField(verbose_name="Отзыв")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Отзыв к заказу #{self.order.id} от {self.user.username}"
+

@@ -79,3 +79,15 @@ class OrderForm(forms.ModelForm):
             'phone_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите номер телефона'}),
         }
 
+
+
+class ReviewForm(forms.Form):
+    """
+    Отзыв покупателя
+    """
+    text = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 4, 'class': 'form-control'}),
+        label="Отзыв",
+        required=True
+    )
+

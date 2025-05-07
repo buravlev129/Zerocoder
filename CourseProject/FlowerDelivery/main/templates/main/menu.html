@@ -25,6 +25,14 @@
                                 <a class="nav-link " href="{% url 'add_product' %}">Карточка</a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link " href="{% url 'order_list' %}">Заказы</a>
+                            </li>
+                            {% comment %}
+                            <li class="nav-item">
+                                <a class="nav-link " href="{% url 'report_list' %}">Аналитика</a>
+                            </li>
+                            {% endcomment %}
+                            <li class="nav-item">
                                 <a class="nav-link" href="{% url 'logout' %}">/Выход</a>
                             </li>
                         {% else %}
@@ -33,6 +41,9 @@
                             </li>
 
                             {% if user.is_authenticated %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'order_history' %}">История</a>
+                                </li>
                                 <li class="nav-item" >
                                     <a class="nav-link cart-button" href="{% url 'process_order' %}">
                                         <i class="bi bi-cart"></i><span class="cart-total">{ {{ request.session.cart_total }} }</span>

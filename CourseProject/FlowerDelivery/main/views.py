@@ -1,11 +1,18 @@
-
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+#from django.core.serializers import serialize
+#from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
-from .forms import RegisterForm, CustomAuthenticationForm, ProductForm, OrderForm
-from .models import UserProfile, Product, Order, OrderDetail, OrderStatus
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from .serializers import ProductRatingSerializer
+
+from .forms import RegisterForm, CustomAuthenticationForm, ProductForm, OrderForm, ReviewForm
+from .models import UserProfile, Product, Order, OrderDetail, OrderStatus, OrderReview, ProductRating
 
 
 def index(request):
@@ -61,6 +68,7 @@ def custom_logout(request):
     return redirect('main')
 
 
+@login_required
 def add_product(request):
     """
     Добавление товаров
@@ -190,6 +198,44 @@ def process_order(request):
 
 
 @login_required
+def repeat_order(request, order_id):
+    """
+    Страница повтора заказа
+    """
+    # Получаем старый заказ текущего пользователя
+    old_order = get_object_or_404(Order, id=order_id, user=request.user)
+
+    # Получаем или создаем корзину в сессии
+    cart = request.session.get('cart', {})
+
+    # Перебираем товары из старого заказа
+    for detail in old_order.details.all():
+        product = detail.product  # Получаем товар из базы данных
+        product_key = str(product.id)
+
+        # Обновляем цену товара из базы данных
+        price = float(product.price)
+
+        # Добавляем товар в корзину
+        if product_key in cart:
+            cart[product_key]['quantity'] += detail.quantity
+        else:
+            cart[product_key] = {
+                'name': product.name,
+                'price': price,
+                'quantity': detail.quantity
+            }
+
+    # Сохраняем обновленную корзину в сессию
+    request.session['cart'] = cart
+    cart_total = len(cart)
+    request.session['cart_total'] = cart_total
+
+    # Перенаправляем пользователя на страницу оформления заказа
+    return redirect('process_order')
+
+
+@login_required
 def order_confirmation(request, order_id):
     """
     Страница подтверждения заказа
@@ -198,4 +244,127 @@ def order_confirmation(request, order_id):
     return render(request, 'main/order_confirmation.html', {'order': order})
 
 
+@login_required
+def order_history(request):
+    """
+    История заказов покупателя
+    """
+    # Получаем все заказы текущего пользователя, отсортированные по дате (самые новые сверху)
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'main/order_history.html', {'orders': orders})
+
+
+@login_required
+def order_details(request, order_id):
+    """
+    Подробности заказа покупателя
+    """
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'repeat':
+            # Логика повторения заказа (если уже реализована)
+            return redirect('repeat_order', order_id=order.id)
+
+        elif action == 'save_review':
+            # Сохранение отзыва
+            form = ReviewForm(request.POST)
+            if form.is_valid():
+                review_text = form.cleaned_data['text']
+
+                OrderReview.objects.update_or_create(
+                    order=order,
+                    user=request.user,
+                    defaults={'text': review_text}
+                )
+
+                messages.success(request, "Отзыв успешно сохранен.")
+                return redirect('order_details', order_id=order.id)
+
+    # Получаем все возможные статусы для комбобокса
+    statuses = OrderStatus.objects.all()
+
+    # Проверяем, есть ли уже отзыв для этого заказа
+    review = getattr(order, 'review', None)
+
+    return render(request, 'main/order_details.html', {
+        'order': order,
+        'statuses': statuses,
+        'review': review,
+        'review_form': ReviewForm()
+    })
+
+
+@login_required
+def order_list(request):
+    """
+    Список заказов для обработки администратором
+    """
+    filter_type = request.GET.get('filter', 'working')
+
+    # incomplete_orders = Order.objects.filter(status__in=[1, 2, 3]).order_by('-created_at')
+    if filter_type == 'completed':
+        orders = Order.objects.filter(status__name='Выполнен').order_by('-created_at')
+    else:
+        orders = Order.objects.filter(status__name__in=['Новый', 'В работе', 'Доставка']).order_by('-created_at')
+    
+    return render(request, 'main/order_list.html', {
+        'orders': orders,
+        'current_filter': filter_type
+    })
+
+
+@login_required
+def order_in_work(request, order_id):
+    """
+    Обработка заказа администратором
+    """
+    order = get_object_or_404(Order, id=order_id)
+
+    if request.method == 'POST':
+        new_status_id = request.POST.get('status')
+        new_status = get_object_or_404(OrderStatus, id=new_status_id)
+
+        order.status = new_status
+        order.save()
+
+        messages.success(request, f"Статус заказа № {order.id} успешно изменен на '{new_status.name}'.")
+        return redirect('order_list')
+
+    statuses = OrderStatus.objects.all()
+    review = getattr(order, 'review', None)
+
+    return render(request, 'main/order_in_work.html', {
+        'order': order, 
+        'statuses': statuses,
+        'review': review
+        })
+
+
+class RateProductView(APIView):
+    """
+    Обработка рейтинга (оценки) товара
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        product_id = request.data.get('product_id')
+        rating = request.data.get('rating')
+
+        if not product_id or not rating:
+            return Response({'error': 'Необходимо указать product_id и rating'}, status=400)
+
+        try:
+            product_rating, created = ProductRating.objects.update_or_create(
+                product_id=product_id,
+                user=request.user,
+                defaults={'rating': rating}
+            )
+            serializer = ProductRatingSerializer(product_rating)
+            return Response(serializer.data, status=200)
+        except Exception as e:
+            return Response({'error': str(e)}, status=500)
 
