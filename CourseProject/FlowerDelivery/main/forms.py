@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth import authenticate
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 
@@ -34,11 +35,26 @@ class CustomAuthenticationForm(AuthenticationForm):
             )
 
     def clean(self):
-        cleaned_data = super().clean()
-        # Добавляем несколько глобальных ошибок
-        # self.add_error(None, "Первая глобальная ошибка.")
-        # self.add_error(None, "Вторая глобальная ошибка.")
-        return cleaned_data
+        username = self.cleaned_data.get('username')
+        password = self.cleaned_data.get('password')
+
+        if username is not None and password:
+            self.user_cache = authenticate(self.request, username=username, password=password)
+            if self.user_cache is None:
+                raise forms.ValidationError(
+                    self.error_messages['invalid_login'],
+                    code='invalid_login',
+                )
+            print(f"User authenticated: {self.user_cache}, is_active: {self.user_cache.is_active}")
+            self.confirm_login_allowed(self.user_cache)
+        return self.cleaned_data
+
+    # def clean(self):
+    #     cleaned_data = super().clean()
+    #     # Добавляем несколько глобальных ошибок
+    #     # self.add_error(None, "Первая глобальная ошибка.")
+    #     # self.add_error(None, "Вторая глобальная ошибка.")
+    #     return cleaned_data
 
 
 class ProductForm(forms.ModelForm):

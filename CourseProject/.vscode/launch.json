@@ -22,7 +22,7 @@
                 "test",
                 //"main.tests.test_views.OrderViewsTest",
                 //"main.tests.test_integration.OrderProcessIntegrationTest",
-                "main.tests.test_models.OrderDetailModelTest",
+                "main.tests.test_forms",
                 //"main.tests",
                 "--noinput",
                 "--keepdb",
