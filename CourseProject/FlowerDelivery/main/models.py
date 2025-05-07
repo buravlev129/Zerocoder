@@ -91,7 +91,7 @@ class OrderStatus(models.Model):
     """
     Статус заказа
     """
-    name = models.CharField(max_length=50, verbose_name="Статус")
+    name = models.CharField(max_length=50, verbose_name="Статус", unique=True)
 
     def __str__(self):
         return self.name
