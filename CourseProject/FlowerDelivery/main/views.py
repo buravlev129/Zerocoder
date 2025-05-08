@@ -115,7 +115,7 @@ def product_list(request):
                 'quantity': 1
             }
 
-        cart_total = len(cart)
+        cart_total = sum([v['quantity'] for v in cart.values()])
 
         # Сохраняем корзину в сессию
         request.session['cart'] = cart
