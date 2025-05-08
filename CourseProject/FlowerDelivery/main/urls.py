@@ -25,4 +25,9 @@ urlpatterns = [
 
     path('api/rate-product/', views.RateProductView.as_view(), name='rate_product'),
 
+    path('report_list/', views.report_list, name='report_list'),
+    path('sales_report/', views.sales_report, name='sales_report'),
+
+
+
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

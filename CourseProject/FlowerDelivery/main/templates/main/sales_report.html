@@ -1,0 +1,75 @@
+{% extends "main/layout.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Отчет по продажам{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h3>Аналитический отчет по продажам</h3>
+
+        <!-- Форма для выбора периода и группировки -->
+        <form method="get" class="mb-4">
+            <div class="row">
+                <div class="col-md-3">
+                    <label for="start_date" class="form-label">Начальная дата</label>
+                    <input type="date" id="start_date" name="start_date" class="form-control" value="{{ start_date|date:'Y-m-d' }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="end_date" class="form-label">Конечная дата</label>
+                    <input type="date" id="end_date" name="end_date" class="form-control" value="{{ end_date|date:'Y-m-d' }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="grouping" class="form-label">Группировка</label>
+                    <select id="grouping" name="grouping" class="form-select">
+                        <!-- option value="day" {% if grouping == 'day' %}selected{% endif %}>По дням</option>
+                        <option value="week" {% if grouping == 'week' %}selected{% endif %}>По неделям</option-->
+                        <option value="month" {% if grouping == 'month' %}selected{% endif %}>По месяцам</option>
+                        <!--option value="year" {% if grouping == 'year' %}selected{% endif %}>По годам</option -->
+                    </select>
+                </div>
+                <div class="col-md-3 align-self-end">
+                    <button type="submit" class="btn btn-primary">Сформировать отчет</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Общие метрики -->
+        <div class="mt-4">
+            <h4>Общие метрики:</h4>
+            <p><strong>Общая выручка:</strong> {{ total_revenue|floatformat:2 }} руб.</p>
+            <p><strong>Средний чек:</strong> {{ average_check|floatformat:2 }} руб.</p>
+            <p><strong>Количество заказов:</strong> {{ total_orders }}</p>
+        </div>
+
+        <!-- Группированные данные -->
+        <h4>Детализация по периодам:</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Период</th>
+                    <th>Общая выручка</th>
+                    <th>Количество заказов</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in grouped_data %}
+                <tr>
+                    <!--td>{{ item.order__created_at__month|default:"Неизвестно" }}</td -->
+                    <td>{{ item.month_name }}</td>
+                    <td>{{ item.total_revenue|floatformat:2 }} руб.</td>
+                    <td>{{ item.total_orders }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Популярные товары -->
+        <h4>Топ-5 популярных товаров:</h4>
+        <ul>
+            {% for product in top_products %}
+            <li>{{ product.product__name }} — {{ product.total_quantity }} шт.</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

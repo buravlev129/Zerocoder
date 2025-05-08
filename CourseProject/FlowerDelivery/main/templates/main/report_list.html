@@ -1,0 +1,12 @@
+{% extends "main/layout.html" %}
+{% load static %}
+
+{% block title %}Аналитика{% endblock %}
+
+{% block content %}
+<h3>Список отчетов</h3>
+<ol>
+    <li><a  href="{% url 'sales_report' %}">Аналитика продаж</a></li>
+    
+</ol>
+{% endblock %}

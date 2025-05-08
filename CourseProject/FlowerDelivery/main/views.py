@@ -1,9 +1,9 @@
+from datetime import datetime
+from django.db.models import Sum, Count, F
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-#from django.core.serializers import serialize
-#from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
 from rest_framework.views import APIView
@@ -368,3 +368,81 @@ class RateProductView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=500)
 
+
+@login_required
+def report_list(request):
+    """
+    Страница со списком доступных отчетов
+    """
+    return render(request, template_name="main/report_list.html")
+
+
+@login_required
+def sales_report(request):
+    """
+    Отчет по продажам
+    """
+    # Получаем параметры из GET-запроса
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    grouping = request.GET.get('grouping', 'month')  # По умолчанию группировка по дням
+
+    # Преобразуем даты в объекты datetime
+    try:
+        start_date = datetime.strptime(start_date, '%Y-%m-%d').date() if start_date else None
+        end_date = datetime.strptime(end_date, '%Y-%m-%d').date() if end_date else None
+    except ValueError:
+        return render(request, 'main/sales_report.html', {'error': 'Неверный формат даты'})
+
+    # Фильтруем заказы по периоду
+    orders = Order.objects.filter(created_at__date__range=(start_date, end_date)) if start_date and end_date else Order.objects.all()
+
+    # Группируем данные
+    if grouping == 'day':
+        group_by = 'order__created_at__date'
+    elif grouping == 'week':
+        group_by = 'order__created_at__week'
+    elif grouping == 'month':
+        group_by = 'order__created_at__month'
+    elif grouping == 'year':
+        group_by = 'order__created_at__year'
+
+    # Агрегация данных
+    grouped_data = (
+        OrderDetail.objects.filter(order__in=orders)
+        .values(group_by)
+        .annotate(
+            total_revenue=Sum(F('price') * F('quantity')),
+            total_orders=Count('order', distinct=True),
+            total_items=Sum('quantity')
+        )
+        .order_by(group_by)
+    )
+
+    MONTH_NAMES = {1: 'Январь', 2: 'Февраль', 3: 'Март', 4: 'Апрель', 5: 'Май', 6: 'Июнь', 7: 'Июль', 8: 'Август', 9: 'Сентябрь', 10: 'Октябрь', 11: 'Ноябрь', 12: 'Декабрь' }
+    for item in grouped_data:
+        item['month_name'] = MONTH_NAMES[item['order__created_at__month']]    
+
+    # Популярные товары
+    top_products = (
+        OrderDetail.objects.filter(order__in=orders)
+        .values('product__name')
+        .annotate(total_quantity=Sum('quantity'))
+        .order_by('-total_quantity')[:5]
+    )
+
+    # Общие метрики
+    total_revenue = sum(item['total_revenue'] for item in grouped_data if item['total_revenue'])
+    total_orders = sum(item['total_orders'] for item in grouped_data if item['total_orders'])
+    average_check = total_revenue / total_orders if total_orders else 0
+
+    return render(request, 'main/sales_report.html', {
+        'grouped_data': grouped_data,
+        'total_revenue': total_revenue,
+        'average_check': average_check,
+        'total_orders': total_orders,
+        'top_products': top_products,
+        'start_date': start_date,
+        'end_date': end_date,
+        'grouping': grouping,
+    })
