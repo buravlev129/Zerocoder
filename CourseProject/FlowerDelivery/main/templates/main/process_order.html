@@ -21,7 +21,7 @@
             <tbody>
                 {% for item in cart_items %}
                 <tr>
-                    <td><img class="img_preview" src="{{ item.product.image.url }}" alt="{{ item.product.name }}"></td>
+                    <td><img class="img_preview" src="{% if item.product.image %} {{ item.product.image.url }} {% endif %}" alt="{{ item.product.name }}"></td>
                     <td>{{ item.product.name }}</td>
                     <td align="center">{{ item.quantity }}</td>
                     <td>{{ item.product.price }} руб.</td>

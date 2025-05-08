@@ -26,7 +26,7 @@
             <tbody>
                 {% for detail in order.details.all %}
                 <tr>
-                    <td><img class="img_preview" src="{{ detail.product.image.url }}" alt="{{ detail.product.name }}"></td>
+                    <td><img class="img_preview" src="{% if detail.product.image %} {{ detail.product.image.url }} {% endif %}" alt="{{ detail.product.name }}"></td>
                     <td>{{ detail.product.name }}</td>
                     <td>{{ detail.quantity }}</td>
                     <td>{{ detail.price }} руб.</td>

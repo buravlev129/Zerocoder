@@ -9,7 +9,7 @@
         {% for product in page_obj %}
         <div class="card" data-product-id="{{ product.id }}">
             {% if product.image %}
-                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                <img src="{% if product.image %} {{ product.image.url }} {% endif %}" alt="{{ product.name }}">
             {% else %}
                 <p>Нет изображения</p>
             {% endif %}
