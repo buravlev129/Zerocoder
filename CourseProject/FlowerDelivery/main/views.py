@@ -14,6 +14,9 @@ from .serializers import ProductRatingSerializer
 from .forms import RegisterForm, CustomAuthenticationForm, ProductForm, OrderForm, ReviewForm
 from .models import UserProfile, Product, Order, OrderDetail, OrderStatus, OrderReview, ProductRating
 
+import main.telegram as bot
+
+
 
 def index(request):
     return render(request, template_name="main/index.html")
@@ -163,12 +166,16 @@ def process_order(request):
         elif action == 'confirm':
             # Если нажата кнопка "Оформить заказ"
             form = OrderForm(request.POST)
+            data = {}
             if form.is_valid():
                 # Создаем новый заказ
                 order = form.save(commit=False)
                 order.user = request.user
-                order.status = OrderStatus.objects.get_or_create(name="Новый")[0]  # Статус "Новый"
+                order.status = OrderStatus.objects.get_or_create(name="Новый")[0]
                 order.save()
+
+                data = {'order_id':order.id, 'username':order.user.username, 'phone':order.phone_number, 'address':order.delivery_address, 'status':order.status }
+                data['details']=[]
 
                 # Добавляем детали заказа
                 for product_id, item in cart.items():
@@ -179,11 +186,16 @@ def process_order(request):
                         price=item['price'],
                         quantity=item['quantity']
                     )
+                    dt = {'product_id':product_id, 'name':product.name, 'price':item['price'], 'quantity':item['quantity'], 'image_path':product.thumbnail.name }
+                    data['details'].append(dt)
+
+                data['total_price'] = order.total_price()
 
                 # Очищаем корзину
                 request.session['cart'] = {}
                 request.session['cart_total'] = 0
 
+                bot.send_new_order_notification(order=data)
                 return redirect('order_confirmation', order_id=order.id)
     else:
         form = OrderForm()

@@ -129,10 +129,13 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# Custom parameters for FlowerDelivery Application
+# Кастомные параметры для приложения FlowerDelivery
 PRODUCT_IMAGE_WIDTH = 800
 PRODUCT_IMAGE_HEIGHT = 600
 PRODUCT_THUMBNAIL_WIDTH = 250
 PRODUCT_THUMBNAIL_HEIGHT = 240
 
+# Параметры для связи с телеграм-ботом
+BOT_TOKEN = "XXXXXXXXX-XXX"
+NOTIFICATION_CHAT_ID = '00000000'
 
