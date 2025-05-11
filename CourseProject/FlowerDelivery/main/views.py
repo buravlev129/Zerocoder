@@ -6,10 +6,11 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 
+from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from .serializers import ProductRatingSerializer
+from .serializers import ProductRatingSerializer, OrderSerializer
 
 from .forms import RegisterForm, CustomAuthenticationForm, ProductForm, OrderForm, ReviewForm
 from .models import UserProfile, Product, Order, OrderDetail, OrderStatus, OrderReview, ProductRating
@@ -458,3 +459,46 @@ def sales_report(request):
         'end_date': end_date,
         'grouping': grouping,
     })
+
+
+class NewOrdersList(generics.ListAPIView):
+    """
+    Обработчик запроса новых заказов
+    """
+    serializer_class = OrderSerializer
+    
+    def get_queryset(self):
+        queryset = Order.objects.filter(status__name='Новый').annotate(username=F('user__username'))
+        return queryset
+
+class InworkOrdersList(generics.ListAPIView):
+    """
+    Обработчик запроса для заказов в обработке
+    """
+    serializer_class = OrderSerializer
+    
+    def get_queryset(self):
+        queryset = Order.objects.filter(status__name='В работе').annotate(username=F('user__username'))
+        return queryset
+
+class DeliveryOrdersList(generics.ListAPIView):
+    """
+    Обработчик запроса для заказов, переданных в доставку
+    """
+    serializer_class = OrderSerializer
+    
+    def get_queryset(self):
+        queryset = Order.objects.filter(status__name='Доставка').annotate(username=F('user__username'))
+        return queryset
+
+class CompletedOrdersList(generics.ListAPIView):
+    """
+    Обработчик запроса выполненных заказов
+    """
+    serializer_class = OrderSerializer
+    
+    def get_queryset(self):
+        queryset = Order.objects.filter(status__name='Выполнен').annotate(username=F('user__username'))
+        return queryset
+
+

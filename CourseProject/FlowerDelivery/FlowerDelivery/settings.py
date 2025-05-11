@@ -44,7 +44,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'imagekit',
     'rest_framework',
+    'rest_framework.authtoken',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -136,6 +143,6 @@ PRODUCT_THUMBNAIL_WIDTH = 250
 PRODUCT_THUMBNAIL_HEIGHT = 240
 
 # Параметры для связи с телеграм-ботом
-BOT_TOKEN = "XXXXXXXXX-XXX"
-NOTIFICATION_CHAT_ID = '00000000'
+BOT_TOKEN = "XXXXXXXXXX"
+NOTIFICATION_CHAT_ID = '0000000000'
 

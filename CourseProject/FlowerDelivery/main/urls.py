@@ -1,7 +1,10 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
+from rest_framework.authtoken.views import obtain_auth_token
+
 from . import views
+
 
 
 urlpatterns = [
@@ -28,6 +31,12 @@ urlpatterns = [
     path('report_list/', views.report_list, name='report_list'),
     path('sales_report/', views.sales_report, name='sales_report'),
 
+    path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
+    path('api/orders/new/', views.NewOrdersList.as_view(), name='new-orders'),
+    path('api/orders/inwork/', views.InworkOrdersList.as_view(), name='inwork-orders'),
+    path('api/orders/delivery/', views.DeliveryOrdersList.as_view(), name='delivery-orders'),
+    path('api/orders/completed/', views.CompletedOrdersList.as_view(), name='completed-orders'),
 
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
