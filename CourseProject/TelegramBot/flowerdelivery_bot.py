@@ -6,7 +6,7 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart, Command
 
-from config import BOT_TOKEN, NOTIFICATION_CHAT_ID
+from config import BOT_TOKEN, NOTIFICATION_CHAT_ID, DJANGO_API_ORDERS_URL
 from utils import get_orders_keyboard
 
 
@@ -95,7 +95,6 @@ def format_order_list(orders, header):
     return '\n'.join(lst)
 
 
-DJANGO_API_ORDERS_URL = 'http://127.0.0.1:8000/api/orders/'
 
 async def fetch_order_list(status=None):
     headers = {

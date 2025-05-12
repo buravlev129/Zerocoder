@@ -5,3 +5,5 @@ BOT_TOKEN = "ХХХХХХХХХХХ"
 NOTIFICATION_CHAT_ID = '0000000000'
 """ID чата или пользователя, которому будут отправляться уведомления"""
 
+DJANGO_API_ORDERS_URL = 'http://127.0.0.1:8000/api/orders/'
+
