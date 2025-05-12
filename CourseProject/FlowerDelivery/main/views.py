@@ -1,16 +1,20 @@
 from datetime import datetime
-from django.db.models import Sum, Count, F
+from django.db.models import Sum, Count, F, ExpressionWrapper, DecimalField, DateField, OuterRef, Subquery
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.db.models.functions import TruncMonth, Cast
+from django.db.models.functions import Coalesce
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils.timezone import get_current_timezone
 
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from .serializers import ProductRatingSerializer, OrderSerializer
+from .serializers import ProductRatingSerializer, OrderSerializer, SalesReportSerializer, PopularGoodsReportSerializer
+
 
 from .forms import RegisterForm, CustomAuthenticationForm, ProductForm, OrderForm, ReviewForm
 from .models import UserProfile, Product, Order, OrderDetail, OrderStatus, OrderReview, ProductRating
@@ -467,6 +471,10 @@ def sales_report(request):
     })
 
 
+#
+# REST API запросы из телеграм бота
+#
+
 class NewOrdersList(generics.ListAPIView):
     """
     Обработчик запроса новых заказов
@@ -507,4 +515,78 @@ class CompletedOrdersList(generics.ListAPIView):
         queryset = Order.objects.filter(status__name='Выполнен').annotate(username=F('user__username'))
         return queryset
 
+
+
+class SalesReport(generics.ListAPIView):
+    """
+    Обработчик отчета по продажам
+    """
+    serializer_class = SalesReportSerializer
+
+    def get_queryset(self):
+        start_date = self.request.query_params.get('start_date')
+        end_date = self.request.query_params.get('end_date')
+        
+        total_price_subquery = OrderDetail.objects.filter(
+            order=OuterRef('pk')
+        ).values('order').annotate(
+            total=Sum(F('price') * F('quantity'))
+        ).values('total')
+        
+        queryset = Order.objects.annotate(
+            total_price=Coalesce(
+                Subquery(
+                    total_price_subquery,
+                    output_field=DecimalField()
+                ),
+                0,
+                output_field=DecimalField()
+            )
+        )
+        
+        if start_date and end_date:
+            queryset = queryset.filter(created_at__range=[start_date, end_date])
+        
+        return queryset.annotate(
+            month=Cast(
+                TruncMonth('created_at', tzinfo=get_current_timezone()),
+                output_field=DateField()
+            )
+        ).values('month').annotate(
+            total_revenue=Sum('total_price'),
+            total_orders=Count('id'),
+            average_check=ExpressionWrapper(
+                Sum('total_price') / Count('id'),
+                output_field=DecimalField()
+            )
+        ).order_by('month')
+
+
+class PopularGoodsReport(generics.ListAPIView):
+    """
+    Обработчик отчета по популярным товарам
+    """
+    serializer_class = PopularGoodsReportSerializer
+
+    def get_queryset(self):
+        start_date = self.request.query_params.get('start_date')
+        end_date = self.request.query_params.get('end_date')
+        
+        # Фильтруем заказы по периоду
+        if start_date and end_date:
+            orders = Order.objects.filter(created_at__date__range=(start_date, end_date)) 
+        else:
+            orders = Order.objects.all()
+
+        top_products = (
+            OrderDetail.objects.filter(order__in=orders)
+            .values('product__name')
+            .annotate(product_id=F('product__id'))
+            .annotate(product_name=F('product__name'))
+            .annotate(total_quantity=Sum('quantity'))
+            .order_by('-total_quantity')[:5]
+        )
+
+        return top_products
+       
 

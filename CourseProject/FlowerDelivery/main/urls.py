@@ -37,6 +37,9 @@ urlpatterns = [
     path('api/orders/delivery/', views.DeliveryOrdersList.as_view(), name='delivery-orders'),
     path('api/orders/completed/', views.CompletedOrdersList.as_view(), name='completed-orders'),
 
+    path('api/reports/sales/', views.SalesReport.as_view(), name='sales-report'),
+    path('api/reports/popular-goods/', views.PopularGoodsReport.as_view(), name='popular-goods-report'),
+
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

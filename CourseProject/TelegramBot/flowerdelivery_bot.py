@@ -6,8 +6,10 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart, Command
 
-from config import BOT_TOKEN, NOTIFICATION_CHAT_ID, DJANGO_API_ORDERS_URL
-from utils import get_orders_keyboard
+from aiohttp import ClientConnectorError, ClientError
+
+from config import BOT_TOKEN, NOTIFICATION_CHAT_ID, DJANGO_API_ORDERS_URL, DJANGO_API_REPORTS_URL
+import utils
 
 
 
@@ -56,6 +58,9 @@ async def send_test_notification(message: Message):
     await bot.send_message(chat_id=NOTIFICATION_CHAT_ID, text=message, parse_mode=ParseMode.HTML)
 
 
+#
+# Обработка заказов
+#
 
 @dp.message(Command("orders"))
 async def orders(message: Message):
@@ -65,35 +70,7 @@ async def orders(message: Message):
     '`*Доставка*    - заказы, переданные в отдел доставки\n`'
     '`*Выполненные* - выполненные заказы\n`'
     )
-    await message.answer(text, reply_markup=get_orders_keyboard(), parse_mode=ParseMode.MARKDOWN_V2)
-
-
-
-def format_order_header(order):
-    lst = [
-        f"<b>Заказ №:</b> {order['id']}",
-        f"<b>Имя клиента:</b> {order['username']}",
-        f"<b>Телефон:</b> {order['phone_number']}",
-        f"<b>Адрес:</b> {order['delivery_address']}",
-        f"<b>Дата:</b> {order['created_at']}",
-    ]
-    return '\n'.join(lst)
-
-def format_order_list(orders, header):
-    lst = [f'<b>{header}</b>']
-    if orders:
-        lst.append(f"<pre>")
-        lst.append(f"ID     Имя клиента           Телефон       Адрес                       Стоимость")
-        lst.append(f"{'-' * 80}")
-        for dt in orders:
-            name = f'{dt["username"][:20]}'
-            address = f'{dt["delivery_address"][:27]}'
-            phone = f'{dt["phone_number"][:12]}'
-            lst.append(f'{dt["id"]:<6} {name:<21} {phone:<13} {address:<28} {dt['total_price']:<9.2f}')
-        lst.append(f"{'-' * 80}")
-        lst.append(f"</pre>")
-    return '\n'.join(lst)
-
+    await message.answer(text, reply_markup=utils.get_orders_keyboard(), parse_mode=ParseMode.MARKDOWN_V2)
 
 
 async def fetch_order_list(status=None):
@@ -102,12 +79,19 @@ async def fetch_order_list(status=None):
     }
 
     api_url = f'{DJANGO_API_ORDERS_URL}{status}/'
-    async with aiohttp.ClientSession() as session:
-        async with session.get(api_url, headers=headers) as response:
-            if response.status == 200:
-                return await response.json()
-            return None
 
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(api_url, headers=headers) as response:
+                if response.status == 200:
+                    return await response.json()
+                return None
+    except ClientConnectorError as e:
+        print(f"Connection error: {e}")
+        return None
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        return None
 
 @dp.callback_query(lambda query: query.data == "new_orders")
 async def process_new_orders(query: CallbackQuery):
@@ -119,7 +103,7 @@ async def process_new_orders(query: CallbackQuery):
         await bot.send_message(query.from_user.id, 'Нет новых заказов')
         return
 
-    text = format_order_list(orders, 'Новые заказы')
+    text = utils.format_order_list(orders, 'Новые заказы')
     await bot.send_message(query.from_user.id, text, parse_mode=ParseMode.HTML)
 
 
@@ -132,7 +116,7 @@ async def process_inwork_orders(query: CallbackQuery):
         await bot.send_message(query.from_user.id, 'Нет заказов в обработке')
         return
 
-    text = format_order_list(orders, 'Заказы в обработке')
+    text = utils.format_order_list(orders, 'Заказы в обработке')
     await bot.send_message(query.from_user.id, text, parse_mode=ParseMode.HTML)
 
 
@@ -145,7 +129,7 @@ async def process_inwork_orders(query: CallbackQuery):
         await bot.send_message(query.from_user.id, 'Нет заказов, переданных в доставку')
         return
 
-    text = format_order_list(orders, 'Заказы, переданные в доставку')
+    text = utils.format_order_list(orders, 'Заказы, переданные в доставку')
     await bot.send_message(query.from_user.id, text, parse_mode=ParseMode.HTML)
 
 
@@ -158,7 +142,66 @@ async def process_inwork_orders(query: CallbackQuery):
         await bot.send_message(query.from_user.id, 'Нет выполненных заказов')
         return
 
-    text = format_order_list(orders, 'Выполненные заказы')
+    text = utils.format_order_list(orders, 'Выполненные заказы')
+    await bot.send_message(query.from_user.id, text, parse_mode=ParseMode.HTML)
+
+
+#
+# Обработка отчетов
+#
+
+@dp.message(Command("reports"))
+async def reports(message: Message):
+    text = ('*Список доступных отчетов*\n')
+    await message.answer(text, reply_markup=utils.get_reports_keyboard(), parse_mode=ParseMode.MARKDOWN_V2)
+
+
+async def fetch_report_data(report=None):
+    headers = {
+        #'Authorization': f'Token {DJANGO_AUTH_TOKEN}'
+    }
+
+    api_url = f'{DJANGO_API_REPORTS_URL}{report}/'
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(api_url, headers=headers) as response:
+                if response.status == 200:
+                    return await response.json()
+                return None
+    except ClientConnectorError as e:
+        print(f"Connection error: {e}")
+        return None
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        return None
+    
+
+@dp.callback_query(lambda query: query.data == "sales-report")
+async def process_sales_report(query: CallbackQuery):
+    await bot.answer_callback_query(query.id, 'Подготовка отчета по продажам...')
+
+    report = await fetch_report_data('sales')
+    if not report:
+        await bot.send_message(query.from_user.id, 'Нет данных для отчета по продажам')
+        return
+    
+    sales = report[0]
+    
+    text = utils.format_sales_report(sales)
+    await bot.send_message(query.from_user.id, text, parse_mode=ParseMode.HTML)
+
+
+@dp.callback_query(lambda query: query.data == "popular-goods-report")
+async def process_popular_goods_report(query: CallbackQuery):
+    await bot.answer_callback_query(query.id, 'Подготовка отчета по товарам...')
+
+    report = await fetch_report_data('popular-goods')
+    if not report:
+        await bot.send_message(query.from_user.id, 'Нет данных для отчета по товарам')
+        return
+    
+    text = utils.format_popular_goods_report(report)
     await bot.send_message(query.from_user.id, text, parse_mode=ParseMode.HTML)
 
 
