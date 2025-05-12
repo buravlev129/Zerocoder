@@ -22,7 +22,6 @@ async def start(message: Message):
     Бот помогает обрабатывать заказы, полученные на сайте магазина www.FlowerDelivery.ru
     /start    - Старт приложения
     /orders   - Список заказов за день
-    /order=NN - Информация о заказе номер NN
     /reports  - Список отчетов
     """
     await message.answer(bf)
@@ -118,7 +117,7 @@ async def process_new_orders(query: CallbackQuery):
 
     orders = await fetch_order_list('new')
     if not orders:
-        await bot.send_message("Нет новых заказов")
+        await bot.send_message(query.from_user.id, 'Нет новых заказов')
         return
 
     text = format_order_list(orders, 'Новые заказы')
@@ -131,7 +130,7 @@ async def process_inwork_orders(query: CallbackQuery):
 
     orders = await fetch_order_list('inwork')
     if not orders:
-        await bot.send_message("Нет заказов в обработке")
+        await bot.send_message(query.from_user.id, 'Нет заказов в обработке')
         return
 
     text = format_order_list(orders, 'Заказы в обработке')
@@ -144,7 +143,7 @@ async def process_inwork_orders(query: CallbackQuery):
 
     orders = await fetch_order_list('delivery')
     if not orders:
-        await bot.send_message("Нет заказов, переданных в доставку")
+        await bot.send_message(query.from_user.id, 'Нет заказов, переданных в доставку')
         return
 
     text = format_order_list(orders, 'Заказы, переданные в доставку')
@@ -157,7 +156,7 @@ async def process_inwork_orders(query: CallbackQuery):
 
     orders = await fetch_order_list('completed')
     if not orders:
-        await bot.send_message("Нет выполненных заказов")
+        await bot.send_message(query.from_user.id, 'Нет выполненных заказов')
         return
 
     text = format_order_list(orders, 'Выполненные заказы')

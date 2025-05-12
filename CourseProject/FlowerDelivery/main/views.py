@@ -343,6 +343,12 @@ def order_in_work(request, order_id):
         order.status = new_status
         order.save()
 
+        data = {'order_id':order.id, 'username':order.user.username, 
+                'phone':order.phone_number, 'address':order.delivery_address, 
+                'status':order.status.name,
+                'total_price':order.total_price() }
+
+        bot.send_order_status_notification(order=data)
         messages.success(request, f"Статус заказа № {order.id} успешно изменен на '{new_status.name}'.")
         return redirect('order_list')
 

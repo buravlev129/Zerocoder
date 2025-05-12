@@ -13,13 +13,14 @@ MEDIA_ROOT = getattr(settings, 'MEDIA_ROOT', 'media_root')
 
 
 
-def format_order_header(order):
-    lst = [
-        f"<b>Заказ №:</b> {order['order_id']} <b>Статус:</b> Новый",
+def format_order_header(order, caption=None):
+    lst = [f'<b><u>{caption}</u></b>'] if caption else []
+    lst.extend([
+        f"<b>Заказ №:</b> {order['order_id']} <b>Статус:</b> {order['status']}",
         f"<b>Имя клиента:</b> {order['username']}",
         f"<b>Телефон:</b> {order['phone']}",
         f"<b>Адрес:</b> {order['address']}",
-    ]
+    ])
     return '\n'.join(lst)
 
 def format_order_details(order):
@@ -79,5 +80,26 @@ def send_new_order_notification(order):
 
     response = requests.post(url, files=files, data=payload)
     if response.status_code != 200:
-        print("Ошибка при отправке уведомления:", response.text)
+        print("[new_order] Ошибка при отправке уведомления:", response.text)
+
+
+def send_order_status_notification(order):
+    """
+    Отправляет уведомление об изменении статуса заказа через Telegram API
+
+    :param order: Словарь с параметрами заказа
+    """
+    text = format_order_header(order, 'Изменение статуса заказа')
+
+    payload = {
+        'chat_id': NOTIFICATION_CHAT_ID,
+        'text': text,
+        'parse_mode': 'HTML',
+    }
+
+    url = f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage'
+
+    response = requests.post(url, data=payload)
+    if response.status_code != 200:
+        print("[order_status] Ошибка при отправке уведомления:", response.text)
 
