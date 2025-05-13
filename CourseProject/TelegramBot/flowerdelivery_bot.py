@@ -9,7 +9,7 @@ from aiogram.filters import CommandStart, Command
 
 from aiohttp import ClientConnectorError, ClientError
 
-from config import BOT_TOKEN, NOTIFICATION_CHAT_ID, DJANGO_API_ORDERS_URL, DJANGO_API_REPORTS_URL
+from config import BOT_TOKEN, DJANGO_API_ORDERS_URL, DJANGO_API_REPORTS_URL
 import utils
 
 
