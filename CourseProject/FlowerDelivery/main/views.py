@@ -546,7 +546,7 @@ class SalesReport(generics.ListAPIView):
         
         if start_date and end_date:
             queryset = queryset.filter(created_at__range=[start_date, end_date])
-        
+
         return queryset.annotate(
             month=Cast(
                 TruncMonth('created_at', tzinfo=get_current_timezone()),

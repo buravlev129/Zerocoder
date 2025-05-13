@@ -1,5 +1,6 @@
 import asyncio
 import aiohttp
+import datetime
 import json
 from aiogram import Bot, Dispatcher, F
 from aiogram.types import Message, CallbackQuery
@@ -33,29 +34,6 @@ async def start(message: Message):
 async def echo(message: Message):
     print(f"Chat ID: {message.chat.id}")
     await message.answer(f"chat_id={message.chat.id}")
-
-
-@dp.message(Command('test'))
-async def send_test_notification(message: Message):
-    """
-    TEST. Отправляет уведомление о новом заказе в Telegram.
-    """
-    order_details = {
-        'order_id': 123,
-        'customer_name': 'Иван Иванов',
-        'phone': '+79991234567',
-        'address': 'ул. Пушкина, д. 10',
-        'flowers': '- Розы (5 шт)\n- Тюльпаны (10 шт)'
-    }
-    message = (
-        f"<b>Новый заказ!</b>\n"
-        f"Заказ №: {order_details['order_id']}\n"
-        f"Имя клиента: {order_details['customer_name']}\n"
-        f"Телефон: {order_details['phone']}\n"
-        f"Адрес: {order_details['address']}\n"
-        f"Цветы:\n{order_details['flowers']}"
-    )
-    await bot.send_message(chat_id=NOTIFICATION_CHAT_ID, text=message, parse_mode=ParseMode.HTML)
 
 
 #
@@ -156,12 +134,14 @@ async def reports(message: Message):
     await message.answer(text, reply_markup=utils.get_reports_keyboard(), parse_mode=ParseMode.MARKDOWN_V2)
 
 
-async def fetch_report_data(report=None):
+async def fetch_report_data(report='', filter=None):
     headers = {
         #'Authorization': f'Token {DJANGO_AUTH_TOKEN}'
     }
 
-    api_url = f'{DJANGO_API_REPORTS_URL}{report}/'
+    api_url = f'{DJANGO_API_REPORTS_URL}' + report+'/' if report else ''
+    if filter:
+        api_url += filter
 
     try:
         async with aiohttp.ClientSession() as session:
@@ -175,13 +155,15 @@ async def fetch_report_data(report=None):
     except Exception as e:
         print(f"Unexpected error: {e}")
         return None
-    
+
 
 @dp.callback_query(lambda query: query.data == "sales-report")
 async def process_sales_report(query: CallbackQuery):
     await bot.answer_callback_query(query.id, 'Подготовка отчета по продажам...')
 
-    report = await fetch_report_data('sales')
+    filter = utils.prepare_month_filter(datetime.datetime.today())
+
+    report = await fetch_report_data('sales', filter)
     if not report:
         await bot.send_message(query.from_user.id, 'Нет данных для отчета по продажам')
         return
@@ -196,7 +178,9 @@ async def process_sales_report(query: CallbackQuery):
 async def process_popular_goods_report(query: CallbackQuery):
     await bot.answer_callback_query(query.id, 'Подготовка отчета по товарам...')
 
-    report = await fetch_report_data('popular-goods')
+    filter = utils.prepare_month_filter(datetime.datetime.today())
+
+    report = await fetch_report_data('popular-goods', filter)
     if not report:
         await bot.send_message(query.from_user.id, 'Нет данных для отчета по товарам')
         return

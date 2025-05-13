@@ -1,3 +1,6 @@
+import calendar
+import datetime
+
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 
 
@@ -21,9 +24,9 @@ def get_reports_keyboard():
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="Отчет по продажам", callback_data="sales-report")],
          [InlineKeyboardButton(text="Отчет по популярным товарам", callback_data="popular-goods-report")],
-         [InlineKeyboardButton(text="Отчет по статусам заказов", callback_data="order-status-report")],
-         [InlineKeyboardButton(text="Отчет по источникам заказов", callback_data="order-sources-report")],
-         [InlineKeyboardButton(text="Отчет по скидкам и акциям", callback_data="discounts-report")],
+        #  [InlineKeyboardButton(text="Отчет по статусам заказов", callback_data="order-status-report")],
+        #  [InlineKeyboardButton(text="Отчет по источникам заказов", callback_data="order-sources-report")],
+        #  [InlineKeyboardButton(text="Отчет по скидкам и акциям", callback_data="discounts-report")],
     ])
     return keyboard
 
@@ -66,10 +69,12 @@ def format_sales_report(sales):
     """
     lst = [
         f"<b>Аналитический отчет по продажам</b>",
-        f"<b>За период:</b> {sales['month']}",
+        f"<pre>",
+        f"<b>За период:</b> {sales['month_name']} {sales['year']} г.",
         f"<b>Общая выручка:</b> {sales['total_revenue']}",
         f"<b>Средний чек:</b> {sales['average_check']}",
         f"<b>Количество заказов:</b> {sales['total_orders']}",
+        f"</pre>",
     ]
     return '\n'.join(lst)
 
@@ -89,3 +94,17 @@ def format_popular_goods_report(goods):
     lst.append(f"</pre>")
     return '\n'.join(lst)
 
+
+def prepare_month_filter(dt):
+    """
+    Из переданной даты создает фильтр вида ?start_date=2025-01-01&end_date=2025-01-31
+    """
+    assert isinstance(dt, datetime.datetime)
+
+    start_dt = dt.strftime('%Y-%m-') + '01'
+
+    last_day = calendar.monthrange(dt.year, dt.month)[1]
+    end_dt = dt.strftime('%Y-%m-') + str(last_day)
+
+    filter = f'?start_date={start_dt}&end_date={end_dt}'
+    return filter
