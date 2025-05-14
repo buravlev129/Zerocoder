@@ -177,3 +177,30 @@ class OrderReview(models.Model):
     class Meta:
         verbose_name = "Отзывы покупателя"
         verbose_name_plural = "Отзывы покупателя"
+
+
+#
+# Поддержка аналитики и отчетов
+#
+
+class SalesReport(models.Model):
+    """
+    Отчеты по продажам
+    """
+    # report_id = models.AutoField(primary_key=True, verbose_name="ID отчета")
+    date = models.DateField(verbose_name="Дата отчета")
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, verbose_name="Заказ")
+
+    total_sales = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Общая сумма продаж")
+    profit = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Прибыль")
+    expenses = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Расходы")
+
+    sales_data = models.JSONField(verbose_name="Данные по продажам", blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания отчета")
+
+    def __str__(self):
+        return f"Отчет #{self.id} за {self.date}"
+    
+    class Meta:
+        verbose_name = "Отчеты по продажам"
+        verbose_name_plural = "Отчеты по продажам"

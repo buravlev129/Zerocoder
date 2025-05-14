@@ -1,0 +1,67 @@
+{% extends "main/layout.html" %}
+{% load static %}
+
+{% block title %}Аналитический отчет{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h3>Аналитический отчет</h3>
+        <form method="post" class="mb-4">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-3">
+                    <label for="start_date" class="form-label">Начальная дата</label>
+                    <input type="date" id="start_date" name="start_date" class="form-control" value="{{ start_date|date:'Y-m-d'|default_if_none:'' }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="end_date" class="form-label">Конечная дата</label>
+                    <input type="date" id="end_date" name="end_date" class="form-control" value="{{ end_date|date:'Y-m-d'|default_if_none:'' }}">
+                </div>
+                <div class="col-md-3 align-self-end">
+                    <button type="submit" class="btn btn-primary">Сформировать отчет</button>
+                </div>
+            </div>
+    </div>
+
+    {% if reports %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Месяц</th>
+                <th>Общая сумма</th>
+                <th>Расходы</th>
+                <th>Прибыль</th>
+                <th>Проданные товары
+                    <br><span style="font-size: smaller;">(Наименование, Количество, Цена)</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in reports %}
+            <tr>
+                <td>{{ report.month }}</td>
+                <td align="right">{{ report.total_sales|floatformat:2 }}</td>
+                <td align="right">{{ report.expenses|floatformat:2 }}</td>
+                <td align="right">{{ report.profit|floatformat:2 }}</td>
+                <td>
+                    <table class="table table-sm mb-0" style="border: none;">
+                        <tbody style="font-size: smaller;">
+                        {% for item in report.sales_details %}
+                        <tr>
+                        <td style="border: none; padding: 0.25rem; text-align: left;">{{ item.product_name }}</td>
+                        <td style="border: none; padding: 0.25rem; text-align: right;">{{ item.quantity }}</td>
+                        <td style="border: none; padding: 0.25rem; text-align: right;">{{ item.price }}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Нет данных за указанный период</p>
+    {% endif %}
+
+{% endblock %}

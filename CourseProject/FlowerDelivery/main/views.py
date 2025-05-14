@@ -9,6 +9,10 @@ from django.db.models.functions import Coalesce
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.timezone import get_current_timezone
 
+import json
+from decimal import Decimal
+from collections import defaultdict
+
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -17,7 +21,7 @@ from .serializers import ProductRatingSerializer, OrderSerializer, SalesReportSe
 
 
 from .forms import RegisterForm, CustomAuthenticationForm, ProductForm, OrderForm, ReviewForm
-from .models import UserProfile, Product, Order, OrderDetail, OrderStatus, OrderReview, ProductRating
+from .models import UserProfile, Product, Order, OrderDetail, OrderStatus, OrderReview, ProductRating, SalesReport
 
 import main.telegram as bot
 
@@ -471,6 +475,71 @@ def sales_report(request):
     })
 
 
+@login_required
+def analytical_report(request):
+    """
+    Аналитика по продажам
+    """
+    reports = []
+    start_date = None
+    end_date = None
+
+    if request.method == 'POST':
+        start_date_str = request.POST.get('start_date')
+        end_date_str = request.POST.get('end_date')
+
+        start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+        end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+
+        filtered_reports = SalesReport.objects.filter(date__range=[start_date, end_date])
+
+        monthly_data = {}
+        for report in filtered_reports:
+            month_key = report.date.strftime('%Y-%m')
+            if month_key not in monthly_data:
+                monthly_data[month_key] = {
+                    'total_sales': 0,
+                    'profit': 0,
+                    'expenses': 0,
+                    'sales_details': []
+                }
+            monthly_data[month_key]['total_sales'] += float(report.total_sales)
+            monthly_data[month_key]['profit'] += float(report.profit)
+            monthly_data[month_key]['expenses'] += float(report.expenses)
+
+            if report.sales_data:
+                data = json.loads(report.sales_data)
+                # monthly_data[month_key]['sales_details'].extend(report.sales_data)
+                monthly_data[month_key]['sales_details'].extend(data)
+
+        for month, data in monthly_data.items():
+            products = summarize_by_product_name(data['sales_details'])
+            reports.append({
+                'month': month,
+                'total_sales': data['total_sales'],
+                'profit': data['profit'],
+                'expenses': data['expenses'],
+                'sales_details': products
+            })
+
+    return render(request, 'main/analytical_report.html', {
+        'reports': reports,
+        'start_date': start_date,
+        'end_date': end_date
+    })
+
+
+def summarize_by_product_name(data):
+    grouped_data = defaultdict(lambda: {'quantity': 0, 'price': Decimal(0)})
+
+    for row in data:
+        product=row['product_name']
+        grouped_data[product]['quantity'] += int(row['quantity'])
+        grouped_data[product]['price'] += Decimal(row['price'])
+
+    return [{'product_name':key, **value} for key, value in grouped_data.items()]
+
+
 #
 # REST API запросы из телеграм бота
 #
@@ -516,8 +585,7 @@ class CompletedOrdersList(generics.ListAPIView):
         return queryset
 
 
-
-class SalesReport(generics.ListAPIView):
+class SalesReportApi(generics.ListAPIView):
     """
     Обработчик отчета по продажам
     """
@@ -561,8 +629,7 @@ class SalesReport(generics.ListAPIView):
             )
         ).order_by('month')
 
-
-class PopularGoodsReport(generics.ListAPIView):
+class PopularGoodsReportApi(generics.ListAPIView):
     """
     Обработчик отчета по популярным товарам
     """

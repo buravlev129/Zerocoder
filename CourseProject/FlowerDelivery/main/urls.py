@@ -30,6 +30,7 @@ urlpatterns = [
 
     path('report_list/', views.report_list, name='report_list'),
     path('sales_report/', views.sales_report, name='sales_report'),
+    path('analytical_report/', views.analytical_report, name='analytical_report'),
 
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
     path('api/orders/new/', views.NewOrdersList.as_view(), name='new-orders'),
@@ -37,8 +38,8 @@ urlpatterns = [
     path('api/orders/delivery/', views.DeliveryOrdersList.as_view(), name='delivery-orders'),
     path('api/orders/completed/', views.CompletedOrdersList.as_view(), name='completed-orders'),
 
-    path('api/reports/sales/', views.SalesReport.as_view(), name='sales-report'),
-    path('api/reports/popular-goods/', views.PopularGoodsReport.as_view(), name='popular-goods-report'),
+    path('api/reports/sales/', views.SalesReportApi.as_view(), name='sales-report'),
+    path('api/reports/popular-goods/', views.PopularGoodsReportApi.as_view(), name='popular-goods-report'),
 
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
