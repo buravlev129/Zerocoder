@@ -42,5 +42,7 @@ urlpatterns = [
     path('api/reports/popular-goods/', views.PopularGoodsReportApi.as_view(), name='popular-goods-report'),
 
 
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+]
 
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

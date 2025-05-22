@@ -12,11 +12,22 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
+BASE_DIR = Path(r'D:\FlowerDelivery_statics') # Path(__file__).resolve().parent.parent
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = BASE_DIR / 'mediafiles'
+
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+LANGUAGE_CODE = 'en-us'
+
+TIME_ZONE = 'UTC'
+USE_I18N = True
+USE_TZ = True
 
 LOGIN_URL = '/login/'
 
@@ -26,10 +37,7 @@ LOGIN_URL = '/login/'
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-n@t0uv8ql&-a#*@1$!-o4pqa+jll14302bvv2967-6&eyfz(3+'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -114,21 +122,6 @@ AUTH_PASSWORD_VALIDATORS = []
 #     },
 # ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-USE_I18N = True
-USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
