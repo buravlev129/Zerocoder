@@ -13,7 +13,9 @@ RUN mkdir -p storage logs admin
 COPY FlowerDelivery ./FlowerDelivery
 COPY supervisord.conf /app/supervisord.conf
 COPY nginx.conf /etc/nginx/nginx.conf
+COPY admin_scripts ./admin
 COPY requirements.txt .
+
 
 RUN python3.12 -m venv /app/venv && \
     /app/venv/bin/pip install --upgrade pip && \
