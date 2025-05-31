@@ -1,0 +1,34 @@
+
+services:
+  fd_bot:
+    image: perpetoom/fd-bot:1.0
+    container_name: FD_bot
+    restart: always
+    environment:
+      BOT_TOKEN: XXXXX-XX
+      DJANGO_API_ORDERS_URL: http://fd_magazin:8000/api/orders/
+      DJANGO_API_REPORTS_URL: http://fd_magazin:8000/api/reports/
+    networks:
+      - fd_network
+
+  fd_magazin:
+    image: perpetoom/flower-delivery:1.0
+    container_name: FD_magazin
+    restart: always
+    environment:
+      BOT_TOKEN: XXXXX-XX
+    volumes:
+      - "../../container/admin:/app/admin"
+      - "../../container/logs:/app/logs"
+      - "../../container/storage:/app/storage"
+    ports:
+      - "80:80"
+      - "8000:8000"
+    networks:
+      - fd_network
+
+networks:
+  fd_network:
+    external: true
+    name: fd_network
+    driver: bridge

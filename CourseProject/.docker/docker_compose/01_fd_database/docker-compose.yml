@@ -1,0 +1,21 @@
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345++
+      # POSTGRES_DB: mydatabase        # Имя базы данных (опционально)
+      POSTGRES_INITDB_ARGS: "--locale=ru_RU.UTF-8 --encoding=UTF8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - ../../Database/PostgreSQL/Data:/var/lib/postgresql/data
+    networks:
+      - custom_network_x1
+
+networks:
+  custom_network_x1:
+

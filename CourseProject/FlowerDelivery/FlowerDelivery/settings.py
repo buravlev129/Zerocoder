@@ -13,9 +13,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-BASE_DIR = Path(r'D:\FlowerDelivery_statics') # Path(__file__).resolve().parent.parent
+BASE_DIR = Path(r'/app/storage') # Path(__file__).resolve().parent.parent
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'mediafiles'
@@ -37,7 +37,7 @@ LOGIN_URL = '/login/'
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-n@t0uv8ql&-a#*@1$!-o4pqa+jll14302bvv2967-6&eyfz(3+'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['fd_magazin', 'localhost', '127.0.0.1', '172.24.0.3', '172.24.0.2']
 
 
 # Application definition

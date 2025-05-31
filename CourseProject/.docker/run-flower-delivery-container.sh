@@ -9,11 +9,9 @@ if [ -z "$(ls -A container/admin)" ]; then
 fi
 
 # Запускаем основной контейнер
-docker run -d -p 8000:8000 \
+docker run -d -p 80:80 \
            -v ${PWD}/container/admin:/app/admin \
            -v ${PWD}/container/logs:/app/logs \
            -v ${PWD}/container/storage:/app/storage \
            --name Magazin perpetoom/flower-delivery:1.0
-
-
 

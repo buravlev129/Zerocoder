@@ -1,0 +1,13 @@
+
+# Admin: 1234567890++
+
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: always
+    ports:
+      - "9000:9000"  # Веб-интерфейс Portainer
+    volumes:
+      - ~/portainer/data:/data  # Локальный каталог для данных Portainer
+      - /var/run/docker.sock:/var/run/docker.sock  # Доступ к Docker на хосте

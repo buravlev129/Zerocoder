@@ -1,6 +1,6 @@
 #!/bin/sh;
 build_path_reestr="perpetoom";
-build_image_name="flower-delivery";
+build_image_name="fd-bot";
 docker_file=$build_image_name.dockerfile
 build_version="1.0";
 path="./images";
